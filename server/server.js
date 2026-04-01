@@ -14,6 +14,9 @@ const reservationRoutes = require('./routes/reservationRoutes');
 
 const app = express();
 
+// Trust Render/proxy headers for rate limiting
+app.set('trust proxy', 1);
+
 // ── CORS ──────────────────────────────────────────────────────────────────────
 const allowedOrigins = [
   'http://localhost:5173',
