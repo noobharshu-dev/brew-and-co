@@ -199,7 +199,7 @@ OTP:         1234
 
 ## 👨‍💻 Author
 
-Built by **Harshit** — [github.com/noobharshu-dev](https://github.com/noobharshu-dev)
+Built by **Harshu** — [github.com/noobharshu-dev](https://github.com/noobharshu-dev)
 
 ---
 
