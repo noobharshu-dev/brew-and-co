@@ -1,12 +1,21 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
+  // Force IPv4 because Render throws ENETUNREACH on IPv6 for SMTP
+  tls: {
+    rejectUnauthorized: false
+  }
 });
+
+// Hack for node to favor IPv4 in DNS lookups
+require('dns').setDefaultResultOrder('ipv4first');
 
 const FROM = `"Brew & Co. ☕" <${process.env.GMAIL_USER}>`;
 
