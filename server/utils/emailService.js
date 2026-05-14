@@ -1,12 +1,17 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
-const FROM = 'Brew & Co. <onboarding@resend.dev>';
+const FROM = `"Brew & Co. ☕" <${process.env.GMAIL_USER}>`;
 
 const sendEmail = async ({ to, subject, html }) => {
-  const { error } = await resend.emails.send({ from: FROM, to, subject, html });
-  if (error) throw new Error(error.message);
+  await transporter.sendMail({ from: FROM, to, subject, html });
 };
 
 const getShortId = (id) => id.toString().slice(-8).toUpperCase();
