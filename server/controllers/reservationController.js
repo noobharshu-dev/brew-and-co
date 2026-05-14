@@ -19,10 +19,14 @@ const createReservation = async (req, res, next) => {
 
     const reservation = await Reservation.create({ name, customerEmail, date, time, guests, status: 'pending' });
 
-    setImmediate(() => {
-      sendOwnerReservationEmail(reservation).catch(err => console.error('Owner reservation email failed:', err.message));
-      sendCustomerReservationEmail(reservation).catch(err => console.error('Customer reservation email failed:', err.message));
-    });
+    // Temporary debug: Wait for email to send so we can see the exact error
+    try {
+      await sendOwnerReservationEmail(reservation);
+      await sendCustomerReservationEmail(reservation);
+    } catch (emailErr) {
+      console.error('Email error details:', emailErr);
+      return res.status(500).json({ success: false, message: 'Email failed: ' + emailErr.message, errorDetails: emailErr });
+    }
 
     res.status(201).json({ success: true, data: reservation });
   } catch (error) {
