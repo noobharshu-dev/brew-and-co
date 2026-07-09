@@ -22,8 +22,8 @@ const EMPTY_FORM = { name: '', price: '', category: 'Coffee', image: '', descrip
 const StatusBadge = ({ status }) => {
   const s = STATUS_COLORS[status] || STATUS_COLORS.pending;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${s.bg} ${s.text} ${s.border}`}>
-      <span className={`w-2 h-2 rounded-full ${s.dot}`} />
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ₹{s.bg} ₹{s.text} ₹{s.border}`}>
+      <span className={`w-2 h-2 rounded-full ₹{s.dot}`} />
       {status}
     </span>
   );
@@ -45,7 +45,7 @@ function MenuTab({ adminKey }) {
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/menu`);
+      const res = await fetch(`₹{API}/api/menu`);
       const data = await res.json();
       if (data.success) setItems(data.data);
     } finally {
@@ -69,7 +69,7 @@ function MenuTab({ adminKey }) {
     setSaving(true);
     try {
       const body = { ...form, price: Number(form.price) };
-      const url = editingId ? `${API}/api/menu/${editingId}` : `${API}/api/menu`;
+      const url = editingId ? `₹{API}/api/menu/₹{editingId}` : `₹{API}/api/menu`;
       const method = editingId ? 'PUT' : 'POST';
       const res = await fetch(url, {
         method,
@@ -106,7 +106,7 @@ function MenuTab({ adminKey }) {
     if (!deleteId) return;
     setDeleting(true);
     try {
-      const res = await fetch(`${API}/api/menu/${deleteId}`, {
+      const res = await fetch(`₹{API}/api/menu/₹{deleteId}`, {
         method: 'DELETE',
         headers: { 'x-admin-key': adminKey }
       });
@@ -131,7 +131,7 @@ function MenuTab({ adminKey }) {
   }, {});
 
   const inputClass = (field) =>
-    `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors ${errors[field] ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-[#6B3A2A]'
+    `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors ₹{errors[field] ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-[#6B3A2A]'
     }`;
 
   return (
@@ -195,7 +195,7 @@ function MenuTab({ adminKey }) {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Price ($) *</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Price (₹) *</label>
                 <input type="number" value={form.price}
                   onChange={e => { setForm(p => ({ ...p, price: e.target.value })); if (errors.price) setErrors(p => ({ ...p, price: null })); }}
                   placeholder="e.g. 4.50" min="0" step="0.01" className={inputClass('price')} />
@@ -287,7 +287,7 @@ function MenuTab({ adminKey }) {
                   <div className="p-4 flex-grow">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-bold text-gray-900 text-base leading-tight">{item.name}</p>
-                      <p className="font-bold text-[#6B3A2A] text-base shrink-0">${Number(item.price).toFixed(2)}</p>
+                      <p className="font-bold text-[#6B3A2A] text-base shrink-0">₹{Number(item.price).toFixed(2)}</p>
                     </div>
                     {item.description && (
                       <p className="text-gray-500 text-xs mt-1.5 line-clamp-2">{item.description}</p>
@@ -324,7 +324,7 @@ function PinScreen({ onUnlock }) {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch(`${API}/api/orders`, {
+      const res = await fetch(`₹{API}/api/orders`, {
         headers: { 'x-admin-key': pin }
       });
       if (res.ok) {
@@ -352,7 +352,7 @@ function PinScreen({ onUnlock }) {
           <input type="password" value={pin}
             onChange={e => { setPin(e.target.value); setError(false); }}
             placeholder="Enter admin key"
-            className={`w-full px-4 py-3 rounded-lg bg-[#1C1C1C] text-white text-center tracking-widest border ${error ? 'border-red-500' : 'border-[#3A3A3A] focus:border-[#6B3A2A]'} focus:outline-none transition-colors`}
+            className={`w-full px-4 py-3 rounded-lg bg-[#1C1C1C] text-white text-center tracking-widest border ₹{error ? 'border-red-500' : 'border-[#3A3A3A] focus:border-[#6B3A2A]'} focus:outline-none transition-colors`}
             autoFocus
           />
           {error && <p className="text-red-400 text-sm">Incorrect admin key. Try again.</p>}
@@ -374,7 +374,7 @@ function OrderCard({ order, adminKey, onStatusChange }) {
   const updateStatus = async (status) => {
     setUpdating(true);
     try {
-      const res = await fetch(`${API}/api/orders/${order._id}/status`, {
+      const res = await fetch(`₹{API}/api/orders/₹{order._id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
         body: JSON.stringify({ status })
@@ -400,7 +400,7 @@ function OrderCard({ order, adminKey, onStatusChange }) {
             <p className="text-xs text-gray-400 font-mono mt-0.5">#{shortId}</p>
           </div>
           <div className="hidden sm:block shrink-0">
-            <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium border ${order.orderType === 'Dine-in' ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-sky-50 text-sky-600 border-sky-200'}`}>
+            <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium border ₹{order.orderType === 'Dine-in' ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-sky-50 text-sky-600 border-sky-200'}`}>
               {order.orderType === 'Dine-in' ? '🍽 Dine-in' : '🥡 Takeaway'}
             </span>
           </div>
@@ -412,7 +412,7 @@ function OrderCard({ order, adminKey, onStatusChange }) {
         <div className="flex items-center gap-4 shrink-0">
           <StatusBadge status={order.status} />
           <div className="text-right min-w-[70px]">
-            <p className="font-bold text-lg text-gray-900">${order.totalPrice.toFixed(2)}</p>
+            <p className="font-bold text-lg text-gray-900">₹{order.totalPrice.toFixed(2)}</p>
           </div>
           {expanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
         </div>
@@ -446,12 +446,12 @@ function OrderCard({ order, adminKey, onStatusChange }) {
                   {order.items.map((item, i) => (
                     <div key={i} className="flex justify-between text-sm">
                       <span className="text-gray-700">{item.name} <span className="text-gray-400">×{item.quantity}</span></span>
-                      <span className="font-medium text-gray-800">${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="font-medium text-gray-800">₹{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                   <div className="border-t border-gray-100 pt-2 mt-2 flex justify-between text-sm font-bold">
                     <span>Total</span>
-                    <span className="text-[#6B3A2A]">${order.totalPrice.toFixed(2)}</span>
+                    <span className="text-[#6B3A2A]">₹{order.totalPrice.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -460,7 +460,7 @@ function OrderCard({ order, adminKey, onStatusChange }) {
               <p className="w-full text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Update Status</p>
               {['pending', 'confirmed', 'completed'].map(s => (
                 <button key={s} onClick={() => updateStatus(s)} disabled={updating || order.status === s}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-medium border transition-all ${order.status === s
+                  className={`px-4 py-1.5 rounded-lg text-sm font-medium border transition-all ₹{order.status === s
                     ? 'bg-[#6B3A2A] text-white border-[#6B3A2A] cursor-default'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-[#6B3A2A] hover:text-[#6B3A2A]'
                     } disabled:opacity-50`}>
@@ -482,7 +482,7 @@ function ReservationCard({ reservation, adminKey, onStatusChange }) {
   const updateStatus = async (status) => {
     setUpdating(true);
     try {
-      const res = await fetch(`${API}/api/reservations/${reservation._id}/status`, {
+      const res = await fetch(`₹{API}/api/reservations/₹{reservation._id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
         body: JSON.stringify({ status })
@@ -519,7 +519,7 @@ function ReservationCard({ reservation, adminKey, onStatusChange }) {
         <div className="flex flex-col gap-2 shrink-0">
           {['pending', 'confirmed', 'cancelled'].map(s => (
             <button key={s} onClick={() => updateStatus(s)} disabled={updating || reservation.status === s}
-              className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ${reservation.status === s
+              className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ₹{reservation.status === s
                 ? 'bg-[#6B3A2A] text-white border-[#6B3A2A] cursor-default'
                 : 'bg-white text-gray-600 border-gray-200 hover:border-[#6B3A2A] hover:text-[#6B3A2A]'
                 } disabled:opacity-50`}>
@@ -547,9 +547,9 @@ export default function Admin() {
     setLoading(true);
     try {
       const [oRes, rRes, mRes] = await Promise.all([
-        fetch(`${API}/api/orders`, { headers: { 'x-admin-key': adminKey } }),
-        fetch(`${API}/api/reservations`, { headers: { 'x-admin-key': adminKey } }),
-        fetch(`${API}/api/menu`)
+        fetch(`₹{API}/api/orders`, { headers: { 'x-admin-key': adminKey } }),
+        fetch(`₹{API}/api/reservations`, { headers: { 'x-admin-key': adminKey } }),
+        fetch(`₹{API}/api/menu`)
       ]);
       const [oData, rData, mData] = await Promise.all([oRes.json(), rRes.json(), mRes.json()]);
       if (oData.success) setOrders(oData.data);
@@ -611,11 +611,11 @@ export default function Admin() {
             { label: 'Pending Orders', value: pendingOrders, color: 'text-orange-600' },
             { label: 'Pending Reservations', value: pendingReservations, color: 'text-blue-700' },
             { label: "Today's Orders", value: todayOrders, color: 'text-green-700' },
-            { label: 'Total Revenue', value: `$${revenue.toFixed(2)}`, color: 'text-[#6B3A2A]' },
+            { label: 'Total Revenue', value: `₹₹{revenue.toFixed(2)}`, color: 'text-[#6B3A2A]' },
           ].map(stat => (
             <div key={stat.label} className="bg-white rounded-xl p-5 shadow-md border border-gray-300">
               <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{stat.label}</p>
-              <p className={`text-3xl font-bold mt-2 ${stat.color}`}>{stat.value}</p>
+              <p className={`text-3xl font-bold mt-2 ₹{stat.color}`}>{stat.value}</p>
             </div>
           ))}
         </div>
@@ -625,11 +625,11 @@ export default function Admin() {
           <div className="flex bg-white rounded-xl border border-gray-300 p-1 shadow-md">
             {TABS.map(t => (
               <button key={t.id} onClick={() => { setTab(t.id); setStatusFilter('all'); }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.id ? 'bg-[#6B3A2A] text-white' : 'text-gray-500 hover:text-gray-800'
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ₹{tab === t.id ? 'bg-[#6B3A2A] text-white' : 'text-gray-500 hover:text-gray-800'
                   }`}>
                 <t.icon size={15} />
                 {t.label}
-                <span className={`text-xs px-1.5 py-0.5 rounded-full ${tab === t.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                <span className={`text-xs px-1.5 py-0.5 rounded-full ₹{tab === t.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
                   {t.count}
                 </span>
               </button>
@@ -640,7 +640,7 @@ export default function Admin() {
             <div className="flex gap-2 flex-wrap">
               {(tab === 'orders' ? ORDER_STATUSES : RESERVE_STATUSES).map(s => (
                 <button key={s} onClick={() => setStatusFilter(s)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${statusFilter === s
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ₹{statusFilter === s
                     ? 'bg-[#6B3A2A] text-white border-[#6B3A2A]'
                     : 'bg-white text-gray-500 border-gray-200 hover:border-[#6B3A2A] hover:text-[#6B3A2A]'
                     }`}>
