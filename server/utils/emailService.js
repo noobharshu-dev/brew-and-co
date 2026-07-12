@@ -1,23 +1,26 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+  // Force IPv4 because Render throws ENETUNREACH on IPv6 for SMTP
+  tls: {
+    rejectUnauthorized: false
+  }
+});
 
-// For Resend free tier without a domain, you MUST use onboarding@resend.dev
-// For production with a verified domain, use something like hello@yourdomain.com
-const FROM = process.env.RESEND_FROM_EMAIL || 'Brew & Co. <onboarding@resend.dev>';
+// Hack for node to favor IPv4 in DNS lookups
+require('dns').setDefaultResultOrder('ipv4first');
+
+const FROM = `"Brew & Co. ☕" <${process.env.GMAIL_USER}>`;
 
 const sendEmail = async ({ to, subject, html }) => {
-  const { data, error } = await resend.emails.send({
-    from: FROM,
-    to,
-    subject,
-    html
-  });
-  
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data;
+  await transporter.sendMail({ from: FROM, to, subject, html });
 };
 
 const getShortId = (id) => id.toString().slice(-8).toUpperCase();
