@@ -73,28 +73,12 @@ const generalLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Strict limit for payment endpoints — 20 per 15 minutes per IP
-const paymentLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  message: { success: false, message: 'Too many payment attempts. Please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
-// Strict limit for reservations — 10 per hour per IP
-const reservationLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 10,
-  message: { success: false, message: 'Too many reservation attempts. Please try again in an hour.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
 // ── ROUTES ────────────────────────────────────────────────────────────────────
 app.use('/api/menu', generalLimiter, menuRoutes);
-app.use('/api/orders', paymentLimiter, orderRoutes);
-app.use('/api/reservations', reservationLimiter, reservationRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 // ── HEALTH CHECK ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
