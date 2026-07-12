@@ -1,208 +1,225 @@
-# ☕ Brew & Co. — Premium Café Website
+# Brew & Co.
 
-A production-grade, full-stack café web application built with React, Node.js, Express, and MongoDB. Features real payment processing, email notifications, PDF receipts, and a complete admin dashboard.
+A full-stack café ordering, payment, reservation, and admin management platform built with React, Express, MongoDB, and Razorpay.
 
-**Live Demo:** [brewandcocafe.vercel.app](https://brewandcocafe.vercel.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933)](#)
+[![React](https://img.shields.io/badge/React-19-61DAFB)](#)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248)](#)
 
----
+## Overview
 
-## ✨ Features
+Brew & Co. is a café web application with a customer-facing storefront and an administrative dashboard. Customers can browse a menu, add items to cart, place prepaid orders, schedule dine-in or takeaway requests, and book tables. The admin area lets staff manage orders, reservations, and menu items from a single interface.
 
-### Customer-Facing
-- **Dynamic Menu** — Browse items by category (Coffee, Desserts, Snacks) with real-time data from the backend
-- **Cart System** — Add/remove items, quantity controls, persistent across page refreshes via localStorage
-- **Razorpay Payments** — Secure, real payment processing in INR with signature verification
-- **Order Scheduling** — Choose Dine-in or Takeaway with date and time slot selection
-- **PDF Receipt** — Downloadable, professionally designed receipt after every order
-- **Table Reservations** — Book a table with full form validation
-- **Email Confirmations** — Branded HTML emails sent to customers after orders and reservations
+## Key Features
 
-### Owner/Admin
-- **Admin Dashboard** — Accessible at `/admin` with password protection
-- **Order Management** — View all orders, expand for full details, update status (Pending → Confirmed → Completed)
-- **Reservation Management** — View and manage all reservations, confirm or cancel
-- **Menu Management** — Add, edit, and delete menu items directly from the dashboard
-- **Real-time Stats** — Pending orders, today's orders, total revenue at a glance
-- **Owner Email Alerts** — Instant email notification for every new order and reservation
+- Customer menu browsing with category-based items for Coffee, Desserts, and Snacks
+- Persistent cart flow with quantity controls and checkout experience
+- Razorpay-powered payment creation and signature verification for order completion
+- Dine-in and takeaway scheduling with date and time selection
+- PDF receipt generation for completed orders
+- Table reservation form with validation and status management
+- Automated order and reservation email notifications for customers and the owner
+- Admin dashboard for viewing stats, updating order status, confirming reservations, and editing menu items
+- Server-side security protections including CORS restrictions, payload limits, rate limiting, and input sanitization
 
----
+## Tech Stack & Architecture
 
-## 🏗️ Tech Stack
+### Frontend
+- React 19 with Vite
+- React Router for route-based navigation
+- Tailwind CSS for UI styling
+- Framer Motion for animations
+- Lucide React for icons
+- jsPDF and jsPDF-AutoTable for receipt generation
 
-| Layer | Technology |
-|---|---|
-| Frontend | React (Vite), Tailwind CSS, Framer Motion |
-| Backend | Node.js, Express.js |
-| Database | MongoDB Atlas (Mongoose) |
-| Payments | Razorpay |
-| Email | Resend |
-| PDF | jsPDF + jsPDF-AutoTable |
-| Deployment | Vercel (frontend), Render (backend) |
+### Backend
+- Node.js with Express
+- MongoDB with Mongoose
+- Razorpay SDK for payment order creation and verification
+- Nodemailer-based email delivery
+- express-rate-limit, mongo-sanitize, and custom middleware for protection
 
----
+### Project Structure
 
-## 📁 Project Structure
-
-```
+```text
 brew-and-co/
-├── client/                   # React frontend (Vite)
-│   ├── src/
-│   │   ├── components/       # Navbar, Footer, MenuCard
-│   │   ├── pages/            # Home, Menu, Cart, Reservation, About, Contact, Admin
-│   │   ├── context/          # CartContext (global state)
-│   │   ├── hooks/            # useCart
-│   │   ├── services/         # api.js (all API calls)
-│   │   └── utils/            # formatPrice
-│   └── vercel.json           # Vercel routing config
-│
-├── server/                   # Express backend
-│   ├── config/               # MongoDB connection
-│   ├── controllers/          # Business logic
-│   ├── middleware/            # Auth, error handler, rate limiting
-│   ├── models/               # Mongoose schemas
-│   ├── routes/               # API routes
-│   ├── utils/                # emailService, helpers
-│   └── server.js             # Entry point
-│
-└── .gitignore
+├── client/
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       ├── context/
+│       ├── hooks/
+│       ├── pages/
+│       ├── services/
+│       ├── utils/
+│       ├── App.jsx
+│       └── main.jsx
+├── server/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── utils/
+│   ├── seed.js
+│   └── server.js
+└── README.md
 ```
 
----
+### Application Flow
 
-## 🔌 API Endpoints
+1. The React client renders public pages such as Home, Menu, Cart, Reservation, and About.
+2. Customer interactions call the Express API for menu data, order creation, payment verification, and reservation submission.
+3. The admin dashboard uses protected routes and a shared admin key to manage orders and reservations.
+4. The backend stores records in MongoDB and sends email notifications for completed transactions and bookings.
 
-### Menu
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/menu` | Public | Get all menu items |
-| POST | `/api/menu` | Admin | Add new item |
-| PUT | `/api/menu/:id` | Admin | Update item |
-| DELETE | `/api/menu/:id` | Admin | Delete item |
-
-### Orders
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/api/orders/create-payment` | Public | Create Razorpay payment order |
-| POST | `/api/orders/verify-payment` | Public | Verify payment + save order |
-| GET | `/api/orders` | Admin | Get all orders |
-| PATCH | `/api/orders/:id/status` | Admin | Update order status |
-
-### Reservations
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/api/reservations` | Public | Create reservation |
-| GET | `/api/reservations` | Admin | Get all reservations |
-| PATCH | `/api/reservations/:id/status` | Admin | Update reservation status |
-
-> Admin routes require `x-admin-key` header.
-
----
-
-## 🚀 Running Locally
+## Getting Started
 
 ### Prerequisites
-- Node.js v18+
-- MongoDB Atlas account
-- Razorpay account (test mode)
-- Resend account
 
-### Backend Setup
+- Node.js 20+ recommended
+- npm 10+
+- MongoDB Atlas account or local MongoDB instance
+- Razorpay account for test mode
+- Gmail account for SMTP email delivery
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repo-url>
+cd brew-and-co-main
+```
+
+### 2. Install dependencies
 
 ```bash
 cd server
 npm install
+
+cd ../client
+npm install
 ```
 
-Create `server/.env`:
+### 3. Configure environment variables
+
+Create a file named `.env` inside the server directory:
+
 ```env
 PORT=5000
-MONGO_URI=your_mongodb_atlas_uri
-ADMIN_KEY=your_secure_admin_key
-RAZORPAY_KEY_ID=rzp_test_xxxx
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/<database>
+ADMIN_KEY=your-secure-admin-key
+RAZORPAY_KEY_ID=rzp_test_xxxxx
 RAZORPAY_KEY_SECRET=your_razorpay_secret
-RESEND_API_KEY=re_xxxxxxxxxxxx
-OWNER_EMAIL=your_email@gmail.com
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=your-gmail-app-password
+OWNER_EMAIL=owner@example.com
 FRONTEND_URL=http://localhost:5173
 ```
 
-```bash
-node server.js
-```
+Create a file named `.env` inside the client directory:
 
-### Frontend Setup
-
-```bash
-cd client
-npm install
-```
-
-Create `client/.env`:
 ```env
 VITE_API_URL=http://localhost:5000
-VITE_RAZORPAY_KEY_ID=rzp_test_xxxx
+VITE_RAZORPAY_KEY_ID=rzp_test_xxxxx
 ```
 
-```bash
-npm run dev
-```
-
-### Seed Menu Data
+### 4. Seed the menu data
 
 ```bash
-cd server
+cd ../server
 node seed.js
 ```
 
----
+### 5. Run the app locally
 
-## 🌐 Deployment
+Start the backend:
 
-| Service | Platform | Config |
-|---|---|---|
-| Frontend | Vercel | Root: `client`, Framework: Vite |
-| Backend | Render | Root: `server`, Start: `node server.js` |
-| Database | MongoDB Atlas | M0 Free Tier |
-
-After deploying backend, add `FRONTEND_URL=https://your-app.vercel.app` to Render environment variables.
-
----
-
-## 🔐 Security
-
-- **Rate Limiting** — 100 req/15min (general), 20 req/15min (payments), 10 req/hour (reservations)
-- **NoSQL Injection Protection** — `mongo-sanitize` strips malicious operators from all input
-- **XSS Protection** — HTML tags stripped from all string fields server-side
-- **Razorpay Signature Verification** — Payment authenticity cryptographically verified before order is saved
-- **Admin Protection** — All write/read admin operations require a secret key header
-- **CORS** — Locked to specific frontend origin
-- **Payload Limit** — JSON body capped at 10kb
-
----
-
-## 📸 Screenshots
-
-> Home Page · Menu · Cart & Checkout · Admin Dashboard
-
----
-
-## 🧪 Test Payment
-
-Use Razorpay test credentials:
-```
-Card Number: 5267 3181 8797 5449
-Expiry:      Any future date
-CVV:         Any 3 digits
-OTP:         1234
+```bash
+cd server
+node server.js
 ```
 
----
+Start the frontend in a separate terminal:
 
-## 👨‍💻 Author
+```bash
+cd client
+npm run dev
+```
 
-Built by **Harshu** — [github.com/noobharshu-dev](https://github.com/noobharshu-dev)
+Open the frontend at `http://localhost:5173` and the backend health check at `http://localhost:5000/health`.
 
----
+## Usage
 
-## 📄 License
+### Customer Experience
 
-MIT — free to use and modify.
+- Visit the home page to explore branding and café information.
+- Open the menu page to view available items.
+- Add menu items to the cart, choose a schedule, and proceed to checkout.
+- Complete payment through Razorpay and receive a receipt and confirmation email.
+- Submit a reservation through the reservation page.
+
+### Admin Experience
+
+- Open `/admin` in the browser.
+- Enter the configured admin key to unlock the dashboard.
+- Review orders, update statuses, manage reservations, and create or edit menu items.
+
+### Core API Endpoints
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/api/menu` | Fetch all menu items |
+| POST | `/api/menu` | Create a menu item (admin) |
+| PUT | `/api/menu/:id` | Update a menu item (admin) |
+| DELETE | `/api/menu/:id` | Delete a menu item (admin) |
+| POST | `/api/orders/create-payment` | Create a Razorpay payment order |
+| POST | `/api/orders/verify-payment` | Verify payment and save an order |
+| GET | `/api/orders` | Retrieve orders (admin) |
+| PATCH | `/api/orders/:id/status` | Update order status (admin) |
+| POST | `/api/reservations` | Create a reservation |
+| GET | `/api/reservations` | Retrieve reservations (admin) |
+| PATCH | `/api/reservations/:id/status` | Update reservation status (admin) |
+| GET | `/health` | Backend health check |
+
+> Protected admin operations require the `x-admin-key` header to match `ADMIN_KEY`.
+
+## Contributing
+
+Contributions are welcome.
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Make your changes and keep them scoped to the relevant frontend or backend area.
+4. Test locally and ensure environment variables are documented if new ones are introduced.
+5. Open a pull request with a clear summary of the change.
+
+Please keep the project structure and existing conventions intact, especially around API routes, admin protection, and UI organization.
+
+## License
+
+This project is licensed under the MIT License.
+
+```text
+MIT License
+
+Copyright (c) 2026 Brew & Co.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

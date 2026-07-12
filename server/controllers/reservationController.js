@@ -4,13 +4,14 @@ const { sendOwnerReservationEmail, sendCustomerReservationEmail } = require('../
 
 const createReservation = async (req, res, next) => {
   try {
-    const { name, customerEmail, date, time, guests } = req.body;
+    const { name, customerEmail, date, time } = req.body;
+    const guests = parseInt(req.body.guests, 10);
 
     if (!name || !name.trim()) throw createError('Name is required', 400);
     if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) throw createError('A valid customer email is required', 400);
     if (!date) throw createError('Date is required', 400);
     if (!time || !time.trim()) throw createError('Time is required', 400);
-    if (guests === undefined || guests === null) throw createError('Number of guests is required', 400);
+    if (isNaN(guests)) throw createError('Number of guests is required', 400);
     if (guests < 1 || guests > 20) throw createError('Guests must be between 1 and 20', 400);
 
     const today = new Date();
@@ -19,14 +20,13 @@ const createReservation = async (req, res, next) => {
 
     const reservation = await Reservation.create({ name, customerEmail, date, time, guests, status: 'pending' });
 
-    // Temporary debug: Wait for email to send so we can see the exact error
-    try {
-      await sendOwnerReservationEmail(reservation);
-      await sendCustomerReservationEmail(reservation);
-    } catch (emailErr) {
-      console.error('Email error details:', emailErr);
-      return res.status(500).json({ success: false, message: 'Email failed: ' + emailErr.message, errorDetails: emailErr });
-    }
+    // Send confirmation emails in the background — don't block the response
+    Promise.all([
+      sendOwnerReservationEmail(reservation),
+      sendCustomerReservationEmail(reservation),
+    ]).catch((emailErr) => {
+      console.error('Reservation email error (non-fatal):', emailErr.message);
+    });
 
     res.status(201).json({ success: true, data: reservation });
   } catch (error) {
