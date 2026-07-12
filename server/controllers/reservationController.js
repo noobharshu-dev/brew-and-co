@@ -20,13 +20,15 @@ const createReservation = async (req, res, next) => {
 
     const reservation = await Reservation.create({ name, customerEmail, date, time, guests, status: 'pending' });
 
-    // Send confirmation emails in the background — don't block the response
-    Promise.all([
-      sendOwnerReservationEmail(reservation),
-      sendCustomerReservationEmail(reservation),
-    ]).catch((emailErr) => {
+    // Send confirmation emails and await them so serverless functions don't freeze
+    try {
+      await Promise.all([
+        sendOwnerReservationEmail(reservation),
+        sendCustomerReservationEmail(reservation),
+      ]);
+    } catch (emailErr) {
       console.error('Reservation email error (non-fatal):', emailErr.message);
-    });
+    }
 
     res.status(201).json({ success: true, data: reservation });
   } catch (error) {

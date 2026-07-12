@@ -82,10 +82,14 @@ const verifyPayment = async (req, res, next) => {
       status: 'confirmed' // paid = confirmed immediately
     });
 
-    setImmediate(() => {
-      sendOwnerOrderEmail(order).catch(err => console.error('Owner email failed:', err.message));
-      sendCustomerOrderEmail(order).catch(err => console.error('Customer email failed:', err.message));
-    });
+    try {
+      await Promise.all([
+        sendOwnerOrderEmail(order),
+        sendCustomerOrderEmail(order)
+      ]);
+    } catch (err) {
+      console.error('Order email failed:', err.message);
+    }
 
     res.status(201).json({ success: true, data: order });
   } catch (error) {
