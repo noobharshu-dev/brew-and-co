@@ -8,6 +8,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
+  connectionTimeout: 3000, // Fail fast if blocked
+  greetingTimeout: 3000,
+  socketTimeout: 3000,
   // Force IPv4 because Render throws ENETUNREACH on IPv6 for SMTP
   tls: {
     rejectUnauthorized: false
@@ -20,7 +23,12 @@ require('dns').setDefaultResultOrder('ipv4first');
 const FROM = `"Brew & Co. ☕" <${process.env.GMAIL_USER}>`;
 
 const sendEmail = async ({ to, subject, html }) => {
-  await transporter.sendMail({ from: FROM, to, subject, html });
+  // Hard limit of 4 seconds so checkout never hangs
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Email sending timed out')), 4000));
+  await Promise.race([
+    transporter.sendMail({ from: FROM, to, subject, html }),
+    timeout
+  ]);
 };
 
 const getShortId = (id) => id.toString().slice(-8).toUpperCase();
